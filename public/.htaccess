@@ -1,0 +1,28 @@
+<IfModule mod_rewrite.c>
+    <IfModule mod_negotiation.c>
+        Options -MultiViews -Indexes
+    </IfModule>
+
+    RewriteEngine On
+
+    # Заблокувати прямий доступ до внутрішніх файлів/папок Laravel.
+    # На проді вміст public/ винесено в корінь сайту, тож ці папки й файли,
+    # які раніше лежали поза document root, тепер опинилися всередині нього.
+    RewriteRule ^(app|bootstrap|config|database|resources|routes|tests|vendor)(/.*)?$ - [F,L]
+    RewriteRule ^storage/(?!app/public/).*$ - [F,L]
+    RewriteRule ^(\.env(\..*)?|composer\.(json|lock)|package(-lock)?\.json|artisan|phpunit\.xml(\.dist)?|webpack\.mix\.js|vite\.config\.js|README\.md|\.git(/.*)?|\.gitignore|\.gitattributes)$ - [F,L]
+
+    # Handle Authorization Header
+    RewriteCond %{HTTP:Authorization} .
+    RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
+    # Redirect Trailing Slashes If Not A Folder...
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_URI} (.+)/$
+    RewriteRule ^ %1 [L,R=301]
+
+    # Send Requests To Front Controller...
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^ index.php [L]
+</IfModule>
